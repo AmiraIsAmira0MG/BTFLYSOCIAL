@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BTFLY.SOCIAL — A new kind of social</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Cabinet+Grotesk:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <!-- fallback if Cabinet Grotesk unavailable -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #07070f;
+      --surface:  #0e0e1c;
+      --surface2: #13132a;
+      --border:   rgba(255,255,255,0.06);
+      --c1: #b48eff;   /* soft violet */
+      --c2: #5de8d4;   /* teal */
+      --c3: #f7c5ff;   /* blush */
+      --c4: #ffd97a;   /* gold */
+      --text: #f2f0fc;
+      --muted: rgba(242,240,252,0.42);
+      --r: 22px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* ── CURSOR ── */
+    .cursor {
+      position: fixed;
+      width: 10px; height: 10px;
+      background: var(--c1);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%,-50%);
+      transition: width .18s, height .18s, background .2s;
+      mix-blend-mode: screen;
+    }
+    .cursor.big {
+      width: 48px; height: 48px;
+      background: rgba(181,142,255,.18);
+      border: 1.5px solid var(--c1);
+    }
+
+    /* ── IRIDESCENT BG ORBS ── */
+    .orbs {
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 0;
+      overflow: hidden;
+    }
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.55;
+    }
+    .orb1 { width:600px;height:600px;top:-10%;left:-5%;
+      background:radial-gradient(circle,#6b35cc 0%,transparent 70%);
+      animation: floatA 20s ease-in-out infinite alternate; }
+    .orb2 { width:500px;height:500px;top:30%;right:-8%;
+      background:radial-gradient(circle,#1bcbbf 0%,transparent 70%);
+      animation: floatB 25s ease-in-out infinite alternate; }
+    .orb3 { width:400px;height:400px;bottom:-5%;left:30%;
+      background:radial-gradient(circle,#c458e8 0%,transparent 70%);
+      animation: floatA 18s ease-in-out infinite alternate-reverse; }
+    .orb4 { width:300px;height:300px;top:60%;left:15%;
+      background:radial-gradient(circle,#f7c5ff 0%,transparent 70%);
+      opacity:0.2;
+      animation: floatB 22s ease-in-out infinite alternate; }
+    @keyframes floatA {
+      from{transform:translate(0,0) scale(1);}
+      to{transform:translate(60px,40px) scale(1.15);}
+    }
+    @keyframes floatB {
+      from{transform:translate(0,0) scale(1.05);}
+      to{transform:translate(-50px,60px) scale(0.95);}
+    }
+
+    /* ── GRADIENT TEXT ── */
+    .grad {
+      background: linear-gradient(135deg, var(--c1) 0%, var(--c2) 50%, var(--c3) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .grad-gold {
+      background: linear-gradient(135deg, var(--c4) 0%, var(--c3) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 1.2rem; left: 50%;
+      transform: translateX(-50%);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.7rem 0.8rem 0.7rem 1.6rem;
+      background: rgba(14,14,28,0.75);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      width: min(820px, calc(100% - 2rem));
+      gap: 1.5rem;
+    }
+    .nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-weight: 900;
+      font-size: 1.1rem;
+      letter-spacing: -0.02em;
+      text-decoration: none;
+    }
+    .nav-links {
+      display: flex; gap: 0.2rem; list-style: none;
+    }
+    .nav-links a {
+      font-size: 0.78rem; font-weight: 500;
+      color: var(--muted); text-decoration: none;
+      padding: 0.4rem 0.85rem; border-radius: 100px;
+      transition: color .2s, background .2s;
+    }
+    .nav-links a:hover { color: var(--text); background: var(--surface2); }
+    .nav-btn {
+      background: linear-gradient(135deg, var(--c1), var(--c2));
+      color: #07070f;
+      font-weight: 700; font-size: 0.78rem;
+      padding: 0.55rem 1.3rem;
+      border-radius: 100px;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: opacity .2s;
+    }
+    .nav-btn:hover { opacity: .85; }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative; z-index: 1;
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: center;
+      text-align: center;
+      padding: 10rem 2rem 6rem;
+    }
+
+    /* Butterfly SVG decoration */
+    .btfly-icon {
+      width: 72px; height: 72px;
+      margin-bottom: 1.8rem;
+      animation: fadeUp .6s ease both, wingFlap 6s ease-in-out 1s infinite;
+      filter: drop-shadow(0 0 24px rgba(181,142,255,0.5));
+    }
+    @keyframes wingFlap {
+      0%,100% { transform: scaleX(1); }
+      48%     { transform: scaleX(0.82); }
+      50%     { transform: scaleX(0.78); }
+      52%     { transform: scaleX(0.82); }
+    }
+
+    .hero-stage {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: rgba(181,142,255,0.1);
+      border: 1px solid rgba(181,142,255,0.28);
+      border-radius: 100px;
+      padding: 0.38rem 1rem;
+      font-size: 0.7rem; font-weight: 600;
+      color: var(--c1);
+      letter-spacing: 0.06em; text-transform: uppercase;
+      margin-bottom: 2rem;
+      animation: fadeUp .6s .05s ease both;
+    }
+    .hero-stage .pip {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--c2);
+      animation: pulse 2.5s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%,100%{opacity:1;transform:scale(1);}
+      50%{opacity:.4;transform:scale(.65);}
+    }
+
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-weight: 900;
+      font-size: clamp(3rem, 8vw, 7rem);
+      line-height: 1.0;
+      letter-spacing: -0.03em;
+      margin-bottom: 1.6rem;
+      animation: fadeUp .6s .12s ease both;
+    }
+    .hero h1 em {
+      font-style: italic;
+    }
+
+    .hero-sub {
+      font-size: clamp(1rem, 2vw, 1.18rem);
+      font-weight: 300;
+      color: var(--muted);
+      max-width: 46ch;
+      line-height: 1.7;
+      margin-bottom: 3rem;
+      animation: fadeUp .6s .22s ease both;
+    }
+
+    /* ── WAITLIST FORM ── */
+    .waitlist-form {
+      display: flex; gap: 0.6rem; flex-wrap: wrap;
+      justify-content: center;
+      animation: fadeUp .6s .32s ease both;
+      margin-bottom: 4rem;
+    }
+    .waitlist-input {
+      background: var(--surface);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 100px;
+      padding: 0.85rem 1.5rem;
+      font-family: inherit; font-size: 0.88rem;
+      color: var(--text);
+      outline: none;
+      width: 280px;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .waitlist-input::placeholder { color: var(--muted); }
+    .waitlist-input:focus {
+      border-color: rgba(181,142,255,0.5);
+      box-shadow: 0 0 0 3px rgba(181,142,255,0.1);
+    }
+    .waitlist-btn {
+      background: linear-gradient(135deg, var(--c1), var(--c2));
+      color: #07070f;
+      font-family: inherit; font-size: 0.88rem; font-weight: 700;
+      padding: 0.85rem 2rem;
+      border: none; border-radius: 100px;
+      cursor: pointer;
+      transition: opacity .2s, transform .2s;
+      white-space: nowrap;
+    }
+    .waitlist-btn:hover { opacity: .88; transform: translateY(-1px); }
+    .waitlist-success {
+      display: none;
+      align-items: center; gap: 0.6rem;
+      background: rgba(93,232,212,0.1);
+      border: 1px solid rgba(93,232,212,0.3);
+      border-radius: 100px;
+      padding: 0.85rem 1.6rem;
+      font-size: 0.85rem; font-weight: 500;
+      color: var(--c2);
+    }
+    .waitlist-success.show { display: flex; }
+    .waitlist-count {
+      font-size: 0.7rem; color: var(--muted);
+      margin-top: 0.8rem;
+      animation: fadeUp .6s .4s ease both;
+    }
+
+    /* ── HERO PILLS ── */
+    .hero-pills {
+      display: flex; gap: 0.7rem; flex-wrap: wrap;
+      justify-content: center;
+      animation: fadeUp .6s .5s ease both;
+    }
+    .pill {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 0.45rem 1rem;
+      font-size: 0.72rem; font-weight: 500;
+      color: var(--muted);
+      display: flex; align-items: center; gap: 0.4rem;
+    }
+    .pill-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+    }
+
+    /* ── MARQUEE ── */
+    .marquee-wrap {
+      position: relative; z-index: 1;
+      overflow: hidden;
+      padding: 1.1rem 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 7rem;
+    }
+    .marquee-inner {
+      display: inline-flex; gap: 2.5rem;
+      white-space: nowrap;
+      animation: marquee 30s linear infinite;
+    }
+    .marquee-inner span {
+      font-size: 0.68rem; font-weight: 600;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--muted);
+    }
+    .marquee-inner .sep { color: var(--c1); }
+    @keyframes marquee {
+      from{transform:translateX(0);}
+      to{transform:translateX(-50%);}
+    }
+
+    /* ── SECTION BASE ── */
+    .section {
+      position: relative; z-index: 1;
+      padding: 0 2rem 7rem;
+      max-width: 1060px;
+      margin: 0 auto;
+    }
+    .sec-label {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      font-size: 0.68rem; font-weight: 600;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--c1); margin-bottom: 1rem;
+    }
+    .sec-label::before {
+      content:''; display:block;
+      width:14px; height:1.5px;
+      background: linear-gradient(90deg, var(--c1), var(--c2));
+      border-radius: 2px;
+    }
+    .sec-title {
+      font-family: 'Playfair Display', serif;
+      font-weight: 900;
+      font-size: clamp(2rem, 4vw, 3rem);
+      letter-spacing: -0.02em; line-height: 1.1;
+      margin-bottom: 3rem;
+    }
+
+    /* ── FEATURES ── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+    .feature-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 2rem;
+      position: relative; overflow: hidden;
+      transition: border-color .25s, transform .25s;
+      cursor: none;
+    }
+    .feature-card::after {
+      content:''; position:absolute;
+      inset:0; border-radius:inherit;
+      opacity:0; transition:opacity .3s;
+    }
+    /* Individual card glows */
+    .feature-card:nth-child(1)::after { background:radial-gradient(circle at 40% 0%,rgba(181,142,255,.08),transparent 60%); }
+    .feature-card:nth-child(2)::after { background:radial-gradient(circle at 40% 0%,rgba(93,232,212,.07),transparent 60%); }
+    .feature-card:nth-child(3)::after { background:radial-gradient(circle at 40% 0%,rgba(247,197,255,.07),transparent 60%); }
+    .feature-card:nth-child(4)::after { background:radial-gradient(circle at 40% 0%,rgba(255,217,122,.07),transparent 60%); }
+    .feature-card:nth-child(5)::after { background:radial-gradient(circle at 40% 0%,rgba(181,142,255,.08),transparent 60%); }
+    .feature-card:nth-child(6)::after { background:radial-gradient(circle at 40% 0%,rgba(93,232,212,.07),transparent 60%); }
+
+    .feature-card:hover { border-color: rgba(181,142,255,.35); transform: translateY(-3px); }
+    .feature-card:hover::after { opacity:1; }
+
+    .feature-icon {
+      font-size: 1.6rem;
+      margin-bottom: 1.2rem;
+      display: block;
+    }
+    .feature-title {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      letter-spacing: -0.01em;
+      margin-bottom: 0.6rem;
+    }
+    .feature-desc {
+      font-size: 0.82rem;
+      font-weight: 300;
+      line-height: 1.7;
+      color: var(--muted);
+    }
+
+    /* ── MANIFESTO / MISSION ── */
+    .manifesto {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: calc(var(--r) * 1.6);
+      padding: 4rem;
+      position: relative; overflow: hidden;
+    }
+    .manifesto::before {
+      content:'';
+      position:absolute; top:-50%; left:50%;
+      transform:translateX(-50%);
+      width:800px; height:500px;
+      background: radial-gradient(ellipse, rgba(181,142,255,.1) 0%, rgba(93,232,212,.06) 40%, transparent 70%);
+      pointer-events:none;
+    }
+    .manifesto-body {
+      position:relative;
+      display:grid; grid-template-columns:1fr 1fr;
+      gap:4rem; align-items:center;
+    }
+    .manifesto p {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+      font-weight: 700; font-style: italic;
+      line-height: 1.5;
+      letter-spacing: -0.01em;
+    }
+    .manifesto-points {
+      display:flex; flex-direction:column; gap:1rem;
+    }
+    .manifesto-point {
+      display:flex; align-items:flex-start; gap:0.9rem;
+      padding:1rem 1.2rem;
+      background:rgba(255,255,255,.03);
+      border:1px solid var(--border);
+      border-radius:14px;
+    }
+    .mp-icon {
+      font-size:1.1rem; flex-shrink:0;
+      margin-top:0.05rem;
+    }
+    .mp-text strong {
+      display:block; font-size:0.85rem; font-weight:600;
+      margin-bottom:0.2rem;
+    }
+    .mp-text span { font-size:0.78rem; color:var(--muted); line-height:1.5; }
+
+    /* ── WAITLIST BOTTOM ── */
+    .waitlist-bottom {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: calc(var(--r)*1.6);
+      padding: 4.5rem 3rem;
+      text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .waitlist-bottom::before {
+      content:'';
+      position:absolute; top:-60%; left:50%;
+      transform:translateX(-50%);
+      width:700px; height:500px;
+      background: radial-gradient(ellipse, rgba(93,232,212,.1) 0%, rgba(181,142,255,.07) 40%, transparent 70%);
+      pointer-events:none;
+    }
+    .waitlist-bottom h2 {
+      font-family:'Playfair Display',serif;
+      font-weight:900; font-style:italic;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      letter-spacing:-0.02em; line-height:1.05;
+      margin-bottom:1rem;
+    }
+    .waitlist-bottom p {
+      font-size:.95rem; font-weight:300;
+      color:var(--muted); max-width:42ch;
+      margin:0 auto 2.5rem; line-height:1.65;
+    }
+    .waitlist-form2 {
+      display:flex; gap:.6rem; flex-wrap:wrap;
+      justify-content:center;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      position:relative; z-index:1;
+      display:flex; align-items:center; justify-content:space-between;
+      padding:1.5rem 2rem;
+      border-top:1px solid var(--border);
+      max-width:1060px; margin:0 auto;
+      font-size:.72rem; color:var(--muted);
+    }
+    footer a { color:inherit; text-decoration:none; transition:color .2s; }
+    footer a:hover { color:var(--text); }
+    .footer-logo {
+      font-family:'Playfair Display',serif;
+      font-weight:900; font-size:.95rem;
+      text-decoration:none;
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from{opacity:0;transform:translateY(22px);}
+      to{opacity:1;transform:translateY(0);}
+    }
+    .reveal {
+      opacity:0; transform:translateY(20px);
+      transition:opacity .55s ease, transform .55s ease;
+    }
+    .reveal.visible { opacity:1; transform:translateY(0); }
+
+    /* ── RESPONSIVE ── */
+    @media(max-width:768px){
+      .features-grid{grid-template-columns:1fr;}
+      .manifesto-body{grid-template-columns:1fr; gap:2rem;}
+      .manifesto{padding:2.5rem 1.5rem;}
+      .waitlist-bottom{padding:2.5rem 1.5rem;}
+      .nav-links{display:none;}
+      footer{flex-direction:column;gap:.5rem;text-align:center;}
+    }
+  </style>
+</head>
+<body>
+
+  <div class="cursor" id="cursor"></div>
+  <div class="orbs">
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+    <div class="orb orb3"></div>
+    <div class="orb orb4"></div>
+  </div>
+
+  <!-- NAV -->
+  <nav>
+    <a href="#" class="nav-logo grad">🦋 BTFLY</a>
+    <ul class="nav-links">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#mission">Mission</a></li>
+      <li><a href="#waitlist">Join</a></li>
+    </ul>
+    <a href="#waitlist" class="nav-btn">Join Waitlist</a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+
+    <svg class="btfly-icon" viewBox="0 0 100 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="wg1" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#b48eff"/>
+          <stop offset="50%" stop-color="#5de8d4"/>
+          <stop offset="100%" stop-color="#f7c5ff"/>
+        </linearGradient>
+        <linearGradient id="wg2" x1="100%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#f7c5ff"/>
+          <stop offset="50%" stop-color="#5de8d4"/>
+          <stop offset="100%" stop-color="#b48eff"/>
+        </linearGradient>
+      </defs>
+      <!-- Left wings -->
+      <path d="M50 40 C40 10 5 5 2 25 C-1 45 30 50 50 42" fill="url(#wg1)" opacity="0.9"/>
+      <path d="M50 42 C35 55 8 65 10 50 C12 35 38 45 50 44" fill="url(#wg1)" opacity="0.7"/>
+      <!-- Right wings -->
+      <path d="M50 40 C60 10 95 5 98 25 C101 45 70 50 50 42" fill="url(#wg2)" opacity="0.9"/>
+      <path d="M50 42 C65 55 92 65 90 50 C88 35 62 45 50 44" fill="url(#wg2)" opacity="0.7"/>
+      <!-- Body -->
+      <ellipse cx="50" cy="42" rx="2.5" ry="18" fill="url(#wg1)" opacity="0.95"/>
+    </svg>
+
+    <div class="hero-stage">
+      <span class="pip"></span>
+      In Development — Join the waitlist
+    </div>
+
+    <h1>Social media,<br><em class="grad">reimagined.</em></h1>
+    <p class="hero-sub">BTFLY is a new generation of decentralised social media — built around you, not around engagement metrics. Own your data. Own your community.</p>
+
+    <div class="waitlist-form" id="hero-form">
+      <input class="waitlist-input" type="email" placeholder="your@email.com" id="hero-email" autocomplete="email"/>
+      <button class="waitlist-btn" onclick="joinWaitlist('hero-email','hero-success')">Get Early Access →</button>
+    </div>
+    <div class="waitlist-success" id="hero-success">
+      <span>✦</span> You're on the list — we'll be in touch.
+    </div>
+    <p class="waitlist-count">Join <strong style="color:var(--text);">early adopters</strong> already waiting</p>
+
+    <div class="hero-pills" style="margin-top:2.5rem;">
+      <div class="pill"><span class="pill-dot" style="background:var(--c1)"></span>Decentralised</div>
+      <div class="pill"><span class="pill-dot" style="background:var(--c2)"></span>Privacy-first</div>
+      <div class="pill"><span class="pill-dot" style="background:var(--c3)"></span>Community owned</div>
+      <div class="pill"><span class="pill-dot" style="background:var(--c4)"></span>No algorithms</div>
+    </div>
+  </section>
+
+  <!-- MARQUEE -->
+  <div class="marquee-wrap">
+    <div class="marquee-inner">
+      <span>Decentralised</span><span class="sep">✦</span>
+      <span>Open Protocol</span><span class="sep">✦</span>
+      <span>Privacy First</span><span class="sep">✦</span>
+      <span>No Ads</span><span class="sep">✦</span>
+      <span>Community Owned</span><span class="sep">✦</span>
+      <span>Your Data, Your Rules</span><span class="sep">✦</span>
+      <span>BTFLY.SOCIAL</span><span class="sep">✦</span>
+      <span>Decentralised</span><span class="sep">✦</span>
+      <span>Open Protocol</span><span class="sep">✦</span>
+      <span>Privacy First</span><span class="sep">✦</span>
+      <span>No Ads</span><span class="sep">✦</span>
+      <span>Community Owned</span><span class="sep">✦</span>
+      <span>Your Data, Your Rules</span><span class="sep">✦</span>
+      <span>BTFLY.SOCIAL</span><span class="sep">✦</span>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <div class="section" id="features">
+    <p class="sec-label reveal">Why BTFLY</p>
+    <h2 class="sec-title reveal">Built <em class="grad">differently.</em></h2>
+    <div class="features-grid">
+
+      <div class="feature-card reveal">
+        <span class="feature-icon">🔓</span>
+        <h3 class="feature-title">Truly decentralised</h3>
+        <p class="feature-desc">No single company owns BTFLY. Built on open protocols so your account and content live outside any one server's control.</p>
+      </div>
+
+      <div class="feature-card reveal" style="transition-delay:.08s">
+        <span class="feature-icon">🛡️</span>
+        <h3 class="feature-title">Privacy by default</h3>
+        <p class="feature-desc">Your data belongs to you. No surveillance advertising, no data brokering, no shadow profiles. Privacy is built in, not bolted on.</p>
+      </div>
+
+      <div class="feature-card reveal" style="transition-delay:.16s">
+        <span class="feature-icon">🌐</span>
+        <h3 class="feature-title">Federated & open</h3>
+        <p class="feature-desc">Connect across the open social web. BTFLY talks to the broader fediverse so you're never locked into one platform or walled garden.</p>
+      </div>
+
+      <div class="feature-card reveal" style="transition-delay:.24s">
+        <span class="feature-icon">✂️</span>
+        <h3 class="feature-title">No algorithmic feed</h3>
+        <p class="feature-desc">See what you choose to see — in chronological order. No black-box ranking designed to maximise your time on screen.</p>
+      </div>
+
+      <div class="feature-card reveal" style="transition-delay:.32s">
+        <span class="feature-icon">🏡</span>
+        <h3 class="feature-title">Communities you own</h3>
+        <p class="feature-desc">Create and moderate your own spaces with rules that reflect your community's values — not a corporation's Terms of Service.</p>
+      </div>
+
+      <div class="feature-card reveal" style="transition-delay:.4s">
+        <span class="feature-icon">⚡</span>
+        <h3 class="feature-title">Fast & lightweight</h3>
+        <p class="feature-desc">No bloated tracking scripts or ad infrastructure. BTFLY is lean, fast, and designed to work well on any device or connection.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MISSION -->
+  <div class="section" id="mission">
+    <p class="sec-label reveal">Our Mission</p>
+    <div class="manifesto reveal">
+      <div class="manifesto-body">
+        <p class="grad">"Social media should serve people — not the other way around."</p>
+        <div class="manifesto-points">
+          <div class="manifesto-point">
+            <span class="mp-icon">🦋</span>
+            <div class="mp-text">
+              <strong>Freedom to connect</strong>
+              <span>No corporate gatekeepers deciding who you can follow or what you can say.</span>
+            </div>
+          </div>
+          <div class="manifesto-point">
+            <span class="mp-icon">🔑</span>
+            <div class="mp-text">
+              <strong>Ownership, not tenancy</strong>
+              <span>Your posts, your followers, your identity — portable and yours forever.</span>
+            </div>
+          </div>
+          <div class="manifesto-point">
+            <span class="mp-icon">🌱</span>
+            <div class="mp-text">
+              <strong>Sustainable by design</strong>
+              <span>No growth-at-all-costs mentality. Built to last, not to flip.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WAITLIST BOTTOM -->
+  <div class="section" id="waitlist">
+    <div class="waitlist-bottom reveal">
+      <h2>Be first to <span class="grad">fly.</span></h2>
+      <p>BTFLY is in active development. Join the waitlist and help shape what social media becomes next.</p>
+      <div class="waitlist-form2">
+        <input class="waitlist-input" type="email" placeholder="your@email.com" id="bottom-email" autocomplete="email"/>
+        <button class="waitlist-btn" onclick="joinWaitlist('bottom-email','bottom-success')">Join the Waitlist →</button>
+      </div>
+      <div class="waitlist-success" id="bottom-success" style="justify-content:center;margin-top:1rem;">
+        <span>✦</span> You're on the list — we'll be in touch.
+      </div>
+      <div style="display:flex;gap:1.5rem;justify-content:center;margin-top:2rem;flex-wrap:wrap;">
+        <span style="font-size:.72rem;color:var(--muted);display:flex;align-items:center;gap:.4rem;">
+          <span style="color:var(--c2)">✓</span> No spam, ever
+        </span>
+        <span style="font-size:.72rem;color:var(--muted);display:flex;align-items:center;gap:.4rem;">
+          <span style="color:var(--c2)">✓</span> Unsubscribe any time
+        </span>
+        <span style="font-size:.72rem;color:var(--muted);display:flex;align-items:center;gap:.4rem;">
+          <span style="color:var(--c2)">✓</span> Early access perks
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <a href="#" class="footer-logo grad">🦋 BTFLY.SOCIAL</a>
+    <span>In development — <a href="https://chinberclart.dev">chinberclart.dev</a></span>
+    <a href="#">Back to top ↑</a>
+  </footer>
+
+  <script>
+    // Cursor
+    const cursor = document.getElementById('cursor');
+    document.addEventListener('mousemove', e => {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top  = e.clientY + 'px';
+    });
+    document.querySelectorAll('a, button, .feature-card').forEach(el => {
+      el.addEventListener('mouseenter', () => cursor.classList.add('big'));
+      el.addEventListener('mouseleave', () => cursor.classList.remove('big'));
+    });
+
+    // Waitlist join
+    function joinWaitlist(inputId, successId) {
+      const input = document.getElementById(inputId);
+      const success = document.getElementById(successId);
+      const email = input.value.trim();
+      const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      if (!valid) {
+        input.style.borderColor = 'rgba(255,109,177,.6)';
+        input.focus();
+        setTimeout(() => input.style.borderColor = '', 1200);
+        return;
+      }
+      // In production, POST to your API here
+      const form = input.closest('.waitlist-form, .waitlist-form2');
+      if (form) form.style.display = 'none';
+      success.classList.add('show');
+    }
+
+    // Also allow Enter key on inputs
+    document.querySelectorAll('.waitlist-input').forEach(inp => {
+      inp.addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+          if (inp.id === 'hero-email') joinWaitlist('hero-email','hero-success');
+          if (inp.id === 'bottom-email') joinWaitlist('bottom-email','bottom-success');
+        }
+      });
+    });
+
+    // Scroll reveal
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+      });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.reveal').forEach(r => io.observe(r));
+  </script>
+</body>
+</html>
