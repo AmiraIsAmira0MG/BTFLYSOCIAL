@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BTFLY.SOCIAL — Platform Specification</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=DM+Mono:wght@300;400;500&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #07070f;
+      --surface: #0e0e1c;
+      --surf2:   #131328;
+      --border:  rgba(255,255,255,0.07);
+      --c1: #b48eff;
+      --c2: #5de8d4;
+      --c3: #f7c5ff;
+      --c4: #ffd97a;
+      --text: #f2f0fc;
+      --muted: rgba(242,240,252,0.45);
+      --muted2: rgba(242,240,252,0.7);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    /* ── ORBS ── */
+    .orbs { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+    .orb { position: absolute; border-radius: 50%; filter: blur(90px); }
+    .orb1 { width:500px;height:500px;top:-15%;left:-10%; background:radial-gradient(circle,rgba(107,53,204,0.5) 0%,transparent 70%); animation:drift 18s ease-in-out infinite alternate; }
+    .orb2 { width:400px;height:400px;bottom:0;right:-5%; background:radial-gradient(circle,rgba(27,203,191,0.35) 0%,transparent 70%); animation:drift 24s ease-in-out infinite alternate-reverse; }
+    .orb3 { width:350px;height:350px;top:50%;left:40%; background:radial-gradient(circle,rgba(196,88,232,0.25) 0%,transparent 70%); animation:drift 20s ease-in-out infinite alternate; }
+    @keyframes drift { from{transform:translate(0,0);} to{transform:translate(40px,30px);} }
+
+    /* ── LAYOUT ── */
+    .shell {
+      position: relative; z-index: 1;
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 0 2rem 8rem;
+    }
+
+    /* ── HEADER ── */
+    .doc-header {
+      padding: 8rem 0 4rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 4rem;
+    }
+    .doc-eyebrow {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem; font-weight: 400;
+      color: var(--c2); letter-spacing: 0.12em; text-transform: uppercase;
+      margin-bottom: 1.4rem;
+    }
+    .doc-eyebrow::before {
+      content: '';
+      display: block; width: 20px; height: 1px;
+      background: var(--c2);
+    }
+    .doc-header h1 {
+      font-family: 'Playfair Display', serif;
+      font-weight: 900; font-style: italic;
+      font-size: clamp(2.8rem, 6vw, 4.5rem);
+      line-height: 1.0; letter-spacing: -0.02em;
+      margin-bottom: 1.2rem;
+    }
+    .grad {
+      background: linear-gradient(135deg, var(--c1) 0%, var(--c2) 60%, var(--c3) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .doc-header-meta {
+      display: flex; gap: 2rem; flex-wrap: wrap; align-items: center;
+      margin-top: 1.5rem;
+    }
+    .meta-pill {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem; color: var(--muted);
+      display: flex; align-items: center; gap: 0.4rem;
+    }
+    .meta-pip { width: 5px; height: 5px; border-radius: 50%; background: var(--c4); display: inline-block; animation: pip 2s ease-in-out infinite; }
+    @keyframes pip { 0%,100%{opacity:1;} 50%{opacity:.3;} }
+    .status-badge {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: rgba(255,217,122,0.1);
+      border: 1px solid rgba(255,217,122,0.3);
+      border-radius: 100px; padding: 0.3rem 0.9rem;
+      font-size: 0.65rem; font-weight: 600;
+      color: var(--c4); letter-spacing: 0.08em; text-transform: uppercase;
+    }
+
+    /* ── TOC ── */
+    .toc {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.8rem 2rem;
+      margin-bottom: 4rem;
+      position: relative; overflow: hidden;
+    }
+    .toc::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, var(--c1), var(--c2), var(--c3));
+    }
+    .toc-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem; color: var(--c1);
+      letter-spacing: 0.15em; text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+    .toc-list { list-style: none; display: flex; flex-direction: column; gap: 0.3rem; }
+    .toc-list li { display: flex; align-items: baseline; gap: 0.6rem; }
+    .toc-num {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem; color: var(--muted); min-width: 1.5rem;
+    }
+    .toc-list a {
+      font-size: 0.82rem; font-weight: 500;
+      color: var(--muted2); text-decoration: none;
+      transition: color 0.2s;
+    }
+    .toc-list a:hover { color: var(--c1); }
+
+    /* ── SECTIONS ── */
+    .doc-section {
+      margin-bottom: 5rem;
+      scroll-margin-top: 2rem;
+    }
+    .section-header {
+      display: flex; align-items: flex-start; gap: 1.2rem;
+      margin-bottom: 2rem; padding-bottom: 1.2rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .section-num {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem; color: var(--muted);
+      margin-top: 0.6rem; min-width: 1.8rem;
+      letter-spacing: 0.05em;
+    }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      letter-spacing: -0.01em; line-height: 1.15;
+    }
+
+    /* ── PROSE ── */
+    .prose p {
+      font-size: 0.95rem; font-weight: 300;
+      line-height: 1.85; color: var(--muted2);
+      margin-bottom: 1.2rem;
+    }
+    .prose p:last-child { margin-bottom: 0; }
+    .prose strong { color: var(--text); font-weight: 600; }
+    .prose em { color: var(--c1); font-style: normal; font-weight: 500; }
+
+    /* ── CALLOUT ── */
+    .callout {
+      border-left: 3px solid var(--c4);
+      padding: 1rem 1.4rem;
+      background: rgba(255,217,122,0.05);
+      border-radius: 0 10px 10px 0;
+      margin: 1.5rem 0;
+    }
+    .callout.info { border-left-color: var(--c2); background: rgba(93,232,212,0.05); }
+    .callout.purple { border-left-color: var(--c1); background: rgba(180,142,255,0.06); }
+    .callout-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem; letter-spacing: 0.14em; text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+    .callout.info .callout-label { color: var(--c2); }
+    .callout .callout-label { color: var(--c4); }
+    .callout.purple .callout-label { color: var(--c1); }
+    .callout p { font-size: 0.88rem !important; margin-bottom: 0 !important; }
+
+    /* ── INFO CARDS ── */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .info-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.4rem 1.5rem;
+      position: relative; overflow: hidden;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .info-card:hover { transform: translateY(-2px); }
+    .info-card-icon { font-size: 1.5rem; margin-bottom: 0.8rem; display: block; }
+    .info-card-title {
+      font-size: 0.82rem; font-weight: 600;
+      margin-bottom: 0.4rem; color: var(--text);
+    }
+    .info-card-text { font-size: 0.75rem; font-weight: 300; color: var(--muted); line-height: 1.6; }
+    .info-card.c1 { border-color: rgba(180,142,255,0.2); }
+    .info-card.c1:hover { border-color: rgba(180,142,255,0.4); }
+    .info-card.c2 { border-color: rgba(93,232,212,0.2); }
+    .info-card.c2:hover { border-color: rgba(93,232,212,0.4); }
+    .info-card.c4 { border-color: rgba(255,217,122,0.2); }
+    .info-card.c4:hover { border-color: rgba(255,217,122,0.4); }
+    .info-card.c3 { border-color: rgba(247,197,255,0.2); }
+    .info-card.c3:hover { border-color: rgba(247,197,255,0.4); }
+
+    /* ── SERVER TYPE CARDS ── */
+    .server-cards { display: flex; flex-direction: column; gap: 1rem; margin: 1.5rem 0; }
+    .server-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.6rem 1.8rem;
+      display: grid; grid-template-columns: auto 1fr;
+      gap: 1.2rem; align-items: start;
+      transition: border-color 0.2s;
+    }
+    .server-card:hover { border-color: var(--card-color); }
+    .server-badge {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 0.4rem; min-width: 52px;
+    }
+    .server-dot {
+      width: 14px; height: 14px; border-radius: 50%;
+      background: var(--card-color);
+      box-shadow: 0 0 12px var(--card-color);
+    }
+    .server-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.55rem; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--card-color); white-space: nowrap;
+    }
+    .server-card-title {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700; font-size: 1.1rem;
+      margin-bottom: 0.5rem; color: var(--card-color);
+    }
+    .server-card-desc {
+      font-size: 0.82rem; font-weight: 300;
+      line-height: 1.7; color: var(--muted2);
+      margin-bottom: 0.8rem;
+    }
+    .server-traits { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    .trait {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem; letter-spacing: 0.06em;
+      padding: 0.2rem 0.6rem; border-radius: 4px;
+      border: 1px solid; opacity: 0.8;
+    }
+    .trait.yes { color: var(--c2); border-color: rgba(93,232,212,0.3); background: rgba(93,232,212,0.06); }
+    .trait.no  { color: rgba(242,240,252,0.35); border-color: rgba(242,240,252,0.1); background: transparent; text-decoration: line-through; }
+
+    /* ── FLOW DIAGRAM ── */
+    .flow {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+    }
+    .flow-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem; color: var(--muted); letter-spacing: 0.12em;
+      text-transform: uppercase; margin-bottom: 1.5rem;
+    }
+    .flow-steps {
+      display: flex; align-items: stretch;
+      gap: 0; min-width: 600px;
+    }
+    .flow-step {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; gap: 0.6rem; position: relative;
+    }
+    .flow-step:not(:last-child)::after {
+      content: '→';
+      position: absolute; right: -10px; top: 22px;
+      color: var(--muted); font-size: 0.9rem; z-index: 2;
+    }
+    .flow-node {
+      width: 44px; height: 44px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; flex-shrink: 0;
+      border: 1px solid var(--border);
+      background: var(--surf2);
+    }
+    .flow-text {
+      font-size: 0.68rem; font-weight: 400;
+      color: var(--muted2); text-align: center; line-height: 1.4;
+      max-width: 80px;
+    }
+    .flow-step.highlight .flow-node {
+      background: rgba(180,142,255,0.12);
+      border-color: rgba(180,142,255,0.4);
+    }
+    .flow-step.highlight .flow-text { color: var(--c1); }
+
+    /* ── PRO TIER ── */
+    .pro-box {
+      background: linear-gradient(135deg, rgba(180,142,255,0.08), rgba(93,232,212,0.05));
+      border: 1px solid rgba(180,142,255,0.3);
+      border-radius: 16px;
+      padding: 2rem;
+      margin: 1.5rem 0;
+      position: relative; overflow: hidden;
+    }
+    .pro-box::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, var(--c1), var(--c2));
+    }
+    .pro-header {
+      display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1.2rem;
+    }
+    .pro-badge {
+      background: linear-gradient(135deg, var(--c1), var(--c2));
+      color: #07070f; font-size: 0.65rem; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 0.25rem 0.7rem; border-radius: 100px;
+    }
+    .pro-title {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700; font-size: 1.1rem;
+    }
+    .pro-features { display: flex; flex-direction: column; gap: 0.6rem; }
+    .pro-feature {
+      display: flex; align-items: flex-start; gap: 0.8rem;
+      font-size: 0.82rem; font-weight: 300; color: var(--muted2);
+    }
+    .pro-feature-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      flex-shrink: 0; margin-top: 0.45rem;
+    }
+    .pro-feature-dot.main { background: var(--c1); }
+    .pro-feature-dot.addon { background: var(--c4); }
+    .pro-feature strong { color: var(--text); }
+
+    /* ── CODE BLOCK ── */
+    .code-block {
+      background: rgba(0,0,0,0.4);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.2rem 1.5rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem; color: var(--c2);
+      line-height: 1.7; margin: 1rem 0;
+      overflow-x: auto;
+    }
+    .code-block .cm { color: var(--muted); }
+    .code-block .ck { color: var(--c1); }
+    .code-block .cv { color: var(--c4); }
+
+    /* ── DIVIDER ── */
+    .doc-divider {
+      display: flex; align-items: center; gap: 1rem;
+      margin: 4rem 0;
+    }
+    .doc-divider-line { flex: 1; height: 1px; background: var(--border); }
+    .doc-divider-glyph { color: var(--muted); font-size: 0.7rem; }
+
+    /* ── FOOTER ── */
+    .doc-footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem 0;
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 1rem;
+      font-size: 0.7rem; color: var(--muted);
+    }
+    .doc-footer a { color: var(--c1); text-decoration: none; }
+    .doc-footer-logo {
+      font-family: 'Playfair Display', serif;
+      font-weight: 900; font-style: italic;
+      font-size: 1rem;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 1.2rem; left: 50%;
+      transform: translateX(-50%);
+      z-index: 300;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.7rem 0.8rem 0.7rem 1.6rem;
+      background: rgba(14,14,28,0.82);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      width: min(820px, calc(100% - 2rem));
+      gap: 1.5rem;
+      transition: border-radius 0.3s;
+    }
+    nav.menu-open { border-radius: 20px; }
+    .nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-weight: 900; font-size: 1.1rem;
+      letter-spacing: -0.02em; text-decoration: none;
+    }
+    .nav-links { display: flex; gap: 0.2rem; list-style: none; }
+    .nav-links a {
+      font-size: 0.78rem; font-weight: 500;
+      color: var(--muted); text-decoration: none;
+      padding: 0.4rem 0.85rem; border-radius: 100px;
+      transition: color .2s, background .2s;
+    }
+    .nav-links a:hover { color: var(--text); background: var(--surf2); }
+    .nav-links a.active { color: var(--text); background: var(--surf2); }
+    .nav-btn {
+      background: linear-gradient(135deg, var(--c1), var(--c2));
+      color: #07070f; font-weight: 700; font-size: 0.78rem;
+      padding: 0.55rem 1.3rem; border-radius: 100px;
+      text-decoration: none; white-space: nowrap; transition: opacity .2s;
+    }
+    .nav-btn:hover { opacity: .85; }
+
+    /* ── HAMBURGER ── */
+    .nav-hamburger {
+      display: none;
+      flex-direction: column; justify-content: center; align-items: center;
+      width: 38px; height: 38px;
+      background: var(--surf2);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      cursor: pointer; gap: 5px; flex-shrink: 0;
+      transition: background 0.2s;
+    }
+    .nav-hamburger:hover { background: rgba(181,142,255,0.12); }
+    .nav-hamburger span {
+      display: block; width: 16px; height: 1.5px;
+      background: var(--text); border-radius: 2px;
+      transition: transform 0.3s ease, opacity 0.3s ease, width 0.3s ease;
+      transform-origin: center;
+    }
+    .nav-hamburger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+    .nav-hamburger.open span:nth-child(2) { opacity: 0; width: 0; }
+    .nav-hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+    /* ── MOBILE DROPDOWN ── */
+    .nav-mobile-menu {
+      display: none; flex-direction: column; gap: 0.25rem; width: 100%;
+      padding-top: 0; border-top: 1px solid transparent; margin-top: 0;
+      max-height: 0; opacity: 0; overflow: hidden;
+      transition: max-height 0.35s ease, opacity 0.25s ease, margin-top 0.3s ease, padding-top 0.3s ease, border-color 0.3s ease;
+    }
+    .nav-mobile-menu.open { max-height: 300px; opacity: 1; padding-top: 0.75rem; border-top-color: var(--border); margin-top: 0.75rem; }
+    .nav-mobile-menu a {
+      font-size: 0.88rem; font-weight: 500; color: var(--muted);
+      text-decoration: none; padding: 0.65rem 0.75rem; border-radius: 12px;
+      transition: color 0.2s, background 0.2s;
+    }
+    .nav-mobile-menu a:hover { color: var(--text); background: var(--surf2); }
+    .nav-mobile-menu .mobile-cta {
+      margin-top: 0.5rem;
+      background: linear-gradient(135deg, var(--c1), var(--c2));
+      color: #07070f; font-weight: 700;
+      text-align: center; border-radius: 100px; padding: 0.75rem;
+    }
+    .nav-mobile-menu .mobile-cta:hover { opacity: 0.88; color: #07070f; }
+
+    @media (max-width: 768px) {
+      nav { flex-wrap: wrap; gap: 0; padding: 0.7rem 0.8rem 0.7rem 1.3rem; align-items: center; }
+      .nav-links { display: none; }
+      .nav-btn { display: none; }
+      .nav-hamburger { display: flex; }
+      .nav-mobile-menu { display: flex; }
+      .nav-logo { flex: 1; }
+    }
+
+    /* ── REVEAL ── */
+    .reveal { opacity: 0; transform: translateY(16px); transition: opacity 0.5s ease, transform 0.5s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 640px) {
+      .card-grid { grid-template-columns: 1fr; }
+      .doc-footer { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="orbs">
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+    <div class="orb orb3"></div>
+  </div>
+
+  <!-- NAV -->
+  <nav id="main-nav">
+    <a href="btfly.html" class="nav-logo grad">🦋 BTFLY</a>
+    <ul class="nav-links">
+      <li><a href="btfly.html#features">Features</a></li>
+      <li><a href="btfly.html#mission">Mission</a></li>
+      <li><a href="btfly.html#waitlist">Join</a></li>
+      <li><a href="btfly-spec.html" class="active">Spec</a></li>
+    </ul>
+    <a href="btfly.html#waitlist" class="nav-btn">Join Waitlist</a>
+    <button class="nav-hamburger" id="nav-hamburger" aria-label="Toggle menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="nav-mobile-menu" id="nav-mobile-menu">
+      <a href="btfly.html#features" class="nav-mobile-link">Features</a>
+      <a href="btfly.html#mission" class="nav-mobile-link">Mission</a>
+      <a href="btfly.html#waitlist" class="nav-mobile-link">Join</a>
+      <a href="btfly-spec.html" class="nav-mobile-link">Spec Docs</a>
+      <a href="btfly.html#waitlist" class="mobile-cta nav-mobile-link">Join Waitlist</a>
+    </div>
+  </nav>
+
+  <div class="shell">
+
+    <!-- HEADER -->
+    <header class="doc-header reveal">
+      <div class="doc-eyebrow">Platform Specification</div>
+      <h1><span class="grad">BTFLY.SOCIAL</span><br>Architecture & Design</h1>
+      <p style="font-size:0.95rem;font-weight:300;color:var(--muted2);max-width:52ch;margin-top:0.8rem;line-height:1.75;">
+        A living technical and product specification for the BTFLY decentralised social platform. This document reflects current thinking — the project is in early development and details will evolve.
+      </p>
+      <div class="doc-header-meta">
+        <div class="status-badge"><span class="meta-pip"></span> Early Development</div>
+        <div class="meta-pill">v0.1 — Draft</div>
+        <div class="meta-pill">Last updated March 2026</div>
+      </div>
+    </header>
+
+    <!-- TOC -->
+    <div class="toc reveal">
+      <div class="toc-label">Contents</div>
+      <ul class="toc-list">
+        <li><span class="toc-num">01</span><a href="#overview">Project Status & Overview</a></li>
+        <li><span class="toc-num">02</span><a href="#global-login">Global Login & Identity</a></li>
+        <li><span class="toc-num">03</span><a href="#node-servers">Node Servers</a></li>
+        <li><span class="toc-num">04</span><a href="#server-types">Server Types: Dark, Grey & Light</a></li>
+        <li><span class="toc-num">05</span><a href="#auth-flow">Authentication Flow</a></li>
+        <li><span class="toc-num">06</span><a href="#moderation">Moderation & Global Bans</a></li>
+        <li><span class="toc-num">07</span><a href="#monetisation">Monetisation</a></li>
+      </ul>
+    </div>
+
+    <!-- 01 STATUS -->
+    <section class="doc-section reveal" id="overview">
+      <div class="section-header">
+        <span class="section-num">01</span>
+        <h2 class="section-title">Project Status &amp; Overview</h2>
+      </div>
+      <div class="prose">
+        <p>BTFLY is a <strong>decentralised, federated social media platform</strong> built around the principle that users — not corporations — should own their presence online. The project is being built by a solo developer and is <strong>nowhere near completion</strong> at this stage. A basic working model exists, but it has not yet been implemented in its intended form.</p>
+        <p>This document exists to capture the intended architecture clearly so that development, future collaborators, and any interested parties understand how the system is meant to work.</p>
+      </div>
+      <div class="callout" style="margin-top:1.5rem;">
+        <div class="callout-label">⚠ Development Status</div>
+        <p class="prose"><strong>The project is openly early-stage.</strong> A proof-of-concept exists but the full system described here — Global Login, node federation, server types, and monetisation — is yet to be properly built out. Expect this spec to evolve significantly.</p>
+      </div>
+    </section>
+
+    <div class="doc-divider reveal"><div class="doc-divider-line"></div><span class="doc-divider-glyph">✦</span><div class="doc-divider-line"></div></div>
+
+    <!-- 02 GLOBAL LOGIN -->
+    <section class="doc-section reveal" id="global-login">
+      <div class="section-header">
+        <span class="section-num">02</span>
+        <h2 class="section-title">Global Login &amp; Identity</h2>
+      </div>
+      <div class="prose">
+        <p>At the core of BTFLY is the <em>Global Login</em> — a centralised identity layer that sits above the federated node network. Every user has one <strong>Cloudlight account</strong>, which acts as their master identity across the entire platform.</p>
+        <p>This is intentionally distinct from the self-hosted node layer beneath it. The Global Login is managed centrally at <strong>login.btfly.social</strong> and serves two critical purposes: it enables a consistent identity across all nodes a user participates in, and it provides the infrastructure for platform-wide moderation.</p>
+      </div>
+      <div class="card-grid" style="margin-top:1.5rem;">
+        <div class="info-card c1">
+          <span class="info-card-icon">🌐</span>
+          <div class="info-card-title">One identity</div>
+          <div class="info-card-text">A single Cloudlight account ties together all of a user's node presences under one global identity.</div>
+        </div>
+        <div class="info-card c2">
+          <span class="info-card-icon">🔑</span>
+          <div class="info-card-title">Node accounts</div>
+          <div class="info-card-text">Each Global Login can have multiple node accounts — one per server — each with its own local profile and posts.</div>
+        </div>
+        <div class="info-card c4">
+          <span class="info-card-icon">🛡️</span>
+          <div class="info-card-title">Moderation anchor</div>
+          <div class="info-card-text">Because every account traces back to a Cloudlight identity, platform-level bans are enforceable globally.</div>
+        </div>
+      </div>
+      <div class="callout info" style="margin-top:1.5rem;">
+        <div class="callout-label">ℹ Cloudlight Tie-in</div>
+        <p>The Global Login is shared with the broader Cloudlight ecosystem. This is the same account system used across Cloudlight's other products, giving BTFLY a built-in user base foundation at launch.</p>
+      </div>
+    </section>
+
+    <div class="doc-divider reveal"><div class="doc-divider-line"></div><span class="doc-divider-glyph">✦</span><div class="doc-divider-line"></div></div>
+
+    <!-- 03 NODE SERVERS -->
+    <section class="doc-section reveal" id="node-servers">
+      <div class="section-header">
+        <span class="section-num">03</span>
+        <h2 class="section-title">Node Servers</h2>
+      </div>
+      <div class="prose">
+        <p>The self-hosted layer of BTFLY is made up of <strong>node servers</strong> — independently operated instances that communities or individuals run themselves. This is the federated part of the platform.</p>
+        <p>Anyone wanting to run a node <strong>downloads the server software from GitHub</strong>, runs it on their own hardware or hosting, and their instance immediately becomes part of the BTFLY network (within the rules of its chosen server type).</p>
+        <p>Nodes operate under their own domain — for example, <code style="font-family:'DM Mono',monospace;font-size:0.85em;color:var(--c2);">example.social</code> — and users access them via that domain's login page.</p>
+      </div>
+      <div class="code-block reveal">
+        <span class="cm"># User flow to join a node</span><br>
+        <span class="ck">1.</span> Download server from GitHub → run locally or on a VPS<br>
+        <span class="ck">2.</span> Node becomes accessible at <span class="cv">login.example.social</span><br>
+        <span class="ck">3.</span> User visits login page → node generates a one-time key<br>
+        <span class="ck">4.</span> User redirected to <span class="cv">login.btfly.social/[key]</span><br>
+        <span class="ck">5.</span> User authenticates with their Cloudlight Global account<br>
+        <span class="ck">6.</span> User enters their node's address: <span class="cv">example.social</span><br>
+        <span class="ck">7.</span> BTFLY asks example.social: "Did this key originate here?"<br>
+        <span class="ck">8.</span> Verified → user logs in or creates node account
+      </div>
+      <div class="prose" style="margin-top:1.2rem;">
+        <p>This flow ensures that <strong>only legitimate login attempts originating from a specific node</strong> can complete authentication for that node — protecting both the user and the server operator from spoofing.</p>
+      </div>
+    </section>
+
+    <div class="doc-divider reveal"><div class="doc-divider-line"></div><span class="doc-divider-glyph">✦</span><div class="doc-divider-line"></div></div>
+
+    <!-- 04 SERVER TYPES -->
+    <section class="doc-section reveal" id="server-types">
+      <div class="section-header">
+        <span class="section-num">04</span>
+        <h2 class="section-title">Server Types</h2>
+      </div>
+      <div class="prose">
+        <p>All BTFLY nodes operate as one of three server types. The type determines how the node participates in the broader network — how visible it is, how it handles federation, and whether its content persists if the server goes offline.</p>
+      </div>
+
+      <div class="server-cards" style="margin-top:1.5rem;">
+
+        <!-- DARK -->
+        <div class="server-card reveal" style="--card-color: #888;">
+          <div class="server-badge">
+            <div class="server-dot"></div>
+            <div class="server-label">Dark</div>
+          </div>
+          <div>
+            <div class="server-card-title">Dark Server</div>
+            <div class="server-card-desc">
+              A fully private, isolated node. Dark servers are <strong style="color:var(--text);">not discoverable</strong> on the global network and have no contact with other servers by default. Accounts on a Dark server can only interact with other accounts on the same Dark server. This is designed for closed, private communities that want full isolation.
+              <br><br>
+              An optional toggle allows Dark server accounts to <strong style="color:var(--text);">view posts from other networks</strong> in read-only mode — they can see but cannot interact, reply, or federate.
+            </div>
+            <div class="server-traits">
+              <span class="trait no">Global discovery</span>
+              <span class="trait no">Cross-server interaction</span>
+              <span class="trait no">Post replication</span>
+              <span class="trait yes">Full isolation</span>
+              <span class="trait yes">Optional read-only view</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- GREY -->
+        <div class="server-card reveal" style="--card-color: #a0b0c0;">
+          <div class="server-badge">
+            <div class="server-dot"></div>
+            <div class="server-label">Grey</div>
+          </div>
+          <div>
+            <div class="server-card-title">Grey Server</div>
+            <div class="server-card-desc">
+              A participatory node that operates as a <strong style="color:var(--text);">normal federated account</strong> on the broader BTFLY network. Grey servers can interact with accounts on other servers — following, replying, liking — just as any user would.
+              <br><br>
+              The key distinction is that Grey servers <strong style="color:var(--text);">do not replicate posts to other servers</strong>. Content lives exclusively on the Grey server. If the server goes offline or shuts down permanently, its posts and accounts are lost — there is no external backup.
+            </div>
+            <div class="server-traits">
+              <span class="trait yes">Global discovery</span>
+              <span class="trait yes">Cross-server interaction</span>
+              <span class="trait no">Post replication</span>
+              <span class="trait no">Content persistence after shutdown</span>
+              <span class="trait yes">Standard federation</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- LIGHT -->
+        <div class="server-card reveal" style="--card-color: var(--c2);">
+          <div class="server-badge">
+            <div class="server-dot"></div>
+            <div class="server-label">Light</div>
+          </div>
+          <div>
+            <div class="server-card-title">Light Server</div>
+            <div class="server-card-desc">
+              The highest participation tier. Light servers replicate their posts across the network, meaning content <strong style="color:var(--text);">persists even if the originating server shuts down</strong>. This is the intended default for public-facing communities who want their content to remain accessible long-term.
+              <br><br>
+              Light servers can also optionally operate as <strong style="color:var(--text);">replication-only nodes</strong> — servers that don't host their own community but instead act as distributed storage for other Light servers, strengthening the network's resilience.
+            </div>
+            <div class="server-traits">
+              <span class="trait yes">Global discovery</span>
+              <span class="trait yes">Cross-server interaction</span>
+              <span class="trait yes">Post replication</span>
+              <span class="trait yes">Content persists after shutdown</span>
+              <span class="trait yes">Optional: replication-only mode</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="callout info" style="margin-top:1.5rem;">
+        <div class="callout-label">ℹ Replication nodes</div>
+        <p>A Light server in replication-only mode hosts no users and runs no community — it exists solely to mirror and preserve content from other Light servers. This allows volunteer operators to contribute to network resilience without running a full social instance.</p>
+      </div>
+    </section>
+
+    <div class="doc-divider reveal"><div class="doc-divider-line"></div><span class="doc-divider-glyph">✦</span><div class="doc-divider-line"></div></div>
+
+    <!-- 05 AUTH FLOW -->
+    <section class="doc-section reveal" id="auth-flow">
+      <div class="section-header">
+        <span class="section-num">05</span>
+        <h2 class="section-title">Authentication Flow</h2>
+      </div>
+      <div class="prose">
+        <p>The login process bridges the self-hosted node with the centralised Global Login in a way that's both secure and user-friendly. No password is ever sent to the node directly — authentication happens through BTFLY's central auth service.</p>
+      </div>
+
+      <div class="flow reveal">
+        <div class="flow-label">Login sequence</div>
+        <div class="flow-steps">
+          <div class="flow-step">
+            <div class="flow-node">🌐</div>
+            <div class="flow-text">User visits login.example.social</div>
+          </div>
+          <div class="flow-step">
+            <div class="flow-node">🔐</div>
+            <div class="flow-text">Node generates one-time key</div>
+          </div>
+          <div class="flow-step highlight">
+            <div class="flow-node">🦋</div>
+            <div class="flow-text">Redirect to login.btfly.social/key</div>
+          </div>
+          <div class="flow-step">
+            <div class="flow-node">👤</div>
+            <div class="flow-text">User signs in with Cloudlight account</div>
+          </div>
+          <div class="flow-step">
+            <div class="flow-node">📍</div>
+            <div class="flow-text">User enters node address</div>
+          </div>
+          <div class="flow-step">
+            <div class="flow-node">✅</div>
+            <div class="flow-text">BTFLY verifies key with node</div>
+          </div>
+          <div class="flow-step highlight">
+            <div class="flow-node">🏠</div>
+            <div class="flow-text">Access granted to node account</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="prose" style="margin-top:1.5rem;">
+        <p>The key verification step — where BTFLY asks the node whether a given key originated there — prevents login hijacking. A key can only be used once and is only valid for the server that generated it, within a short time window.</p>
+      </div>
+    </section>
+
+    <div class="doc-divider reveal"><div class="doc-divider-line"></div><span class="doc-divider-glyph">✦</span><div class="doc-divider-line"></div></div>
+
+    <!-- 06 MODERATION -->
+    <section class="doc-section reveal" id="moderation">
+      <div class="section-header">
+        <span class="section-num">06</span>
+        <h2 class="section-title">Moderation &amp; Global Bans</h2>
+      </div>
+      <div class="prose">
+        <p>Because every node account is tied to a Cloudlight Global Login, the platform retains the ability to enforce <strong>global bans</strong> at the identity layer. If an account is found to be in violation of laws or platform-level rules — not just a node's community rules — the underlying Global Login can be banned, which propagates across all nodes simultaneously.</p>
+        <p>This is an intentional design choice. Fully decentralised networks struggle to deal with bad actors who simply migrate to new nodes after being banned. By anchoring identity globally, BTFLY can act decisively when <strong>legal violations</strong> or severe platform-wide abuse occurs, without relying on individual node operators to act.</p>
+      </div>
+      <div class="callout purple">
+        <div class="callout-label">📋 Moderation layers</div>
+        <p><strong>Node-level:</strong> Server operators manage their own communities under their own rules. <strong>Platform-level:</strong> BTFLY can issue global bans via the Cloudlight identity system for legal violations or severe platform-wide abuse only. The intention is for platform-level intervention to be a last resort.</p>
+      </div>
+    </section>
+
+    <div class="doc-divider reveal"><div class="doc-divider-line"></div><span class="doc-divider-glyph">✦</span><div class="doc-divider-line"></div></div>
+
+    <!-- 07 MONETISATION -->
+    <section class="doc-section reveal" id="monetisation">
+      <div class="section-header">
+        <span class="section-num">07</span>
+        <h2 class="section-title">Monetisation</h2>
+      </div>
+      <div class="prose">
+        <p>BTFLY's monetisation strategy is designed to be honest and transparent. The platform is openly early-stage and revenue isn't a current priority, but the intended model is as follows.</p>
+      </div>
+
+      <div class="callout" style="margin-bottom:1.5rem;">
+        <div class="callout-label">📣 Advertising</div>
+        <p>Ads will be introduced closer to a public release. This is acknowledged openly — the platform is not ad-free forever. Ads will only run on standard free accounts; Pro users will never see ads.</p>
+      </div>
+
+      <div class="pro-box reveal">
+        <div class="pro-header">
+          <div class="pro-badge">PRO</div>
+          <div class="pro-title">BTFLY Pro — Premium tier</div>
+        </div>
+        <div class="pro-features">
+          <div class="pro-feature">
+            <div class="pro-feature-dot main"></div>
+            <span><strong>Verification badge</strong> — a visible badge next to the user's profile icon across all nodes, similar to X's verified marker. Signals a paid, committed user.</span>
+          </div>
+          <div class="pro-feature">
+            <div class="pro-feature-dot main"></div>
+            <span><strong>No ads</strong> — Pro accounts have a completely ad-free experience across the platform.</span>
+          </div>
+          <div class="pro-feature">
+            <div class="pro-feature-dot main"></div>
+            <span><strong>Cloud backup of posts</strong> — posts made on any node are backed up centrally, so content isn't lost if a Grey server shuts down.</span>
+          </div>
+          <div class="pro-feature" style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid var(--border);">
+            <div class="pro-feature-dot addon"></div>
+            <span><strong>Cloud-hosted node</strong> <em style="color:var(--c4);font-style:normal;font-size:0.75rem;margin-left:0.3rem;">add-on cost</em> — for an additional fee, BTFLY hosts and manages the node server on the user's behalf, removing the need for self-hosting while retaining the federated model.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="prose" style="margin-top:1.5rem;">
+        <p>The cloud-hosted node add-on is separate from the base Pro subscription because the infrastructure cost is meaningfully higher. This keeps the base Pro tier affordable while offering a full managed option for those who want it.</p>
+      </div>
+    </section>
+
+    <div class="doc-divider reveal"><div class="doc-divider-line"></div><span class="doc-divider-glyph">✦</span><div class="doc-divider-line"></div></div>
+
+    <!-- FOOTER -->
+    <footer class="doc-footer reveal">
+      <span class="doc-footer-logo grad">🦋 BTFLY.SOCIAL</span>
+      <span>Spec v0.1 · Draft · March 2026</span>
+      <span>Part of <a href="https://chinberclart.dev">chinberclart.dev</a></span>
+    </footer>
+
+  </div>
+
+  <script>
+    const hamburger = document.getElementById('nav-hamburger');
+    const mobileMenu = document.getElementById('nav-mobile-menu');
+    const mainNav = document.getElementById('main-nav');
+    hamburger.addEventListener('click', () => {
+      const isOpen = mobileMenu.classList.toggle('open');
+      hamburger.classList.toggle('open', isOpen);
+      mainNav.classList.toggle('menu-open', isOpen);
+      hamburger.setAttribute('aria-expanded', isOpen);
+    });
+    document.querySelectorAll('.nav-mobile-link').forEach(link => {
+      link.addEventListener('click', () => {
+        mobileMenu.classList.remove('open');
+        hamburger.classList.remove('open');
+        mainNav.classList.remove('menu-open');
+        hamburger.setAttribute('aria-expanded', 'false');
+      });
+    });
+    document.addEventListener('click', e => {
+      if (!mainNav.contains(e.target)) {
+        mobileMenu.classList.remove('open');
+        hamburger.classList.remove('open');
+        mainNav.classList.remove('menu-open');
+        hamburger.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+      });
+    }, { threshold: 0.08 });
+    document.querySelectorAll('.reveal').forEach(r => io.observe(r));
+  </script>
+</body>
+</html>
